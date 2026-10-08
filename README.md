@@ -1,11 +1,8 @@
-# epit
-1 day prototype
-
-## 🫀 Triglyceride Defense
+# 🫀 Triglyceride Defense
 
 A sarcastic browser game: rogue triglycerides are swimming toward your heart to blow it up, and your only weapon is clicking.
 
-**Play:** https://workszop.github.io/epit/heart-defense/
+**Play:** https://workszop.github.io/epit/
 
 - Click / tap the fat molecules before they reach the heart.
 - Chain hits for combo multipliers; misses reset them.
@@ -13,11 +10,10 @@ A sarcastic browser game: rogue triglycerides are swimming toward your heart to 
 - Every 5th wave: **The Deep Fryer** boss.
 - Keys: `P` / `Esc` pause, `M` mute.
 
-Plain HTML/CSS/JS with no build step or dependencies. Source is in [`heart-defense/`](heart-defense/).
-To run locally, open `heart-defense/index.html` in a browser.
+Plain HTML/CSS/JS with no build step or dependencies (`index.html`, `style.css`, `game.js`).
+To run locally, open `index.html` in a browser. Add `?debug` to the URL to expose game internals for automated testing.
 
 ### GitHub Pages
 
-The repo is served as-is (`.nojekyll` disables Jekyll processing). To enable it:
-**Settings → Pages → Build and deployment → Source: "Deploy from a branch" → `main` / `(root)` → Save.**
-The game will then be at `/epit/heart-defense/`, and the existing e-PIT viewer stays at `/epit/`.
+The repo is served as-is (`.nojekyll` disables Jekyll processing).
+Enable it once under **Settings → Pages → Source: "Deploy from a branch" → `main` / `(root)`**.
