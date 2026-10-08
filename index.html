@@ -1,762 +1,102 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>e-PIT Viewer</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-:root {
-  --bg-main: #FFFFFF;
-  --bg-section: #F4F6F5;
-  --accent: #1E3932;
-  --accent-light: #2D5246;
-  --text-heading: #1A1A1A;
-  --text-body: #666666;
-  --border: #EBEBEB;
-  --radius-sm: 4px;
-  --radius-md: 10px;
-  --radius-lg: 16px;
-  --success: #047857;
-  --success-bg: #ECFDF5;
-  --warning: #B45309;
-  --warning-bg: #FEF3C7;
-  --danger: #B91C1C;
-  --danger-bg: #FEF2F2;
-  --info: #1D4ED8;
-  --info-bg: #EFF6FF;
-  --nav-h: 64px;
-  --tab-h: 56px;
-}
-
-* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 14px;
-  line-height: 1.5;
-  color: var(--text-body);
-  background: var(--bg-section);
-  -webkit-font-smoothing: antialiased;
-  max-width: 430px;
-  margin: 0 auto;
-  min-height: 100vh;
-  position: relative;
-}
-
-/* ── TOP NAV ── */
-.topnav {
-  position: fixed;
-  top: 0; left: 50%; transform: translateX(-50%);
-  width: 100%; max-width: 430px;
-  height: var(--nav-h);
-  background: var(--accent);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 20px;
-  z-index: 100;
-}
-.topnav-title { color: #fff; font-weight: 700; font-size: 17px; letter-spacing: -0.02em; }
-.topnav-sub { color: rgba(255,255,255,0.55); font-size: 11px; font-weight: 500; margin-top: 1px; }
-.topnav-logo {
-  width: 36px; height: 36px;
-  background: rgba(255,255,255,0.12);
-  border-radius: 8px;
-  display: flex; align-items: center; justify-content: center;
-  color: white;
-}
-
-/* ── BOTTOM NAV ── */
-.bottomnav {
-  position: fixed;
-  bottom: 0; left: 50%; transform: translateX(-50%);
-  width: 100%; max-width: 430px;
-  height: var(--tab-h);
-  background: var(--bg-main);
-  border-top: 1px solid var(--border);
-  display: flex;
-  z-index: 100;
-}
-.bnav-item {
-  flex: 1;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  gap: 4px;
-  cursor: pointer;
-  color: #999;
-  font-size: 10px; font-weight: 600;
-  text-transform: uppercase; letter-spacing: 0.05em;
-  transition: color 150ms;
-  border: none; background: none;
-}
-.bnav-item.active { color: var(--accent); }
-.bnav-item svg { transition: stroke 150ms; }
-
-/* ── SCROLLABLE CONTENT ── */
-.content {
-  padding-top: calc(var(--nav-h) + 16px);
-  padding-bottom: calc(var(--tab-h) + 16px);
-  padding-left: 16px; padding-right: 16px;
-}
-
-/* ── SCREENS ── */
-.screen { display: none; }
-.screen.active { display: block; }
-
-/* ── STATUS BANNER ── */
-.status-banner {
-  background: var(--success-bg);
-  border: 1px solid #A7F3D0;
-  border-radius: var(--radius-lg);
-  padding: 16px;
-  display: flex; align-items: flex-start; gap: 12px;
-  margin-bottom: 16px;
-}
-.status-banner.warning {
-  background: var(--warning-bg);
-  border-color: #FCD34D;
-}
-.status-dot {
-  width: 10px; height: 10px; border-radius: 50%;
-  background: var(--success); flex-shrink: 0; margin-top: 4px;
-}
-.status-banner.warning .status-dot { background: var(--warning); }
-.status-banner-title { font-size: 13px; font-weight: 700; color: var(--text-heading); }
-.status-banner-body { font-size: 12px; color: var(--text-body); margin-top: 2px; }
-
-/* ── CARDS ── */
-.card {
-  background: var(--bg-main);
-  border-radius: var(--radius-lg);
-  padding: 16px;
-  margin-bottom: 12px;
-  border: 1px solid var(--border);
-}
-.card-title {
-  font-size: 11px; font-weight: 700;
-  text-transform: uppercase; letter-spacing: 0.08em;
-  color: var(--text-body); margin-bottom: 12px;
-  display: flex; align-items: center; gap: 6px;
-}
-
-/* ── BIG NUMBER ── */
-.big-row {
-  display: flex; justify-content: space-between; align-items: flex-end;
-  margin-bottom: 4px;
-}
-.big-num {
-  font-size: 26px; font-weight: 700;
-  color: var(--text-heading); letter-spacing: -0.03em;
-}
-.big-num.pos { color: var(--success); }
-.big-num.neg { color: var(--danger); }
-.big-label { font-size: 11px; color: var(--text-body); }
-
-/* ── ROW ITEMS ── */
-.row-item {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 11px 0;
-  border-bottom: 1px solid var(--border);
-}
-.row-item:last-child { border-bottom: none; }
-.row-item-label { font-size: 13px; color: var(--text-body); max-width: 60%; }
-.row-item-val { font-size: 13px; font-weight: 600; color: var(--text-heading); }
-.row-item-val.pos { color: var(--success); }
-.row-item-val.neg { color: var(--danger); }
-.row-item-val.accent { color: var(--accent); }
-
-/* ── SECTION DIVIDER ── */
-.divider-label {
-  font-size: 10px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 0.1em; color: #999;
-  margin: 20px 0 8px;
-  padding-left: 4px;
-}
-
-/* ── BADGE ── */
-.badge {
-  display: inline-flex; align-items: center;
-  padding: 3px 8px; border-radius: 4px;
-  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
-}
-.badge-success { background: var(--success-bg); color: var(--success); }
-.badge-warning { background: var(--warning-bg); color: var(--warning); }
-.badge-info { background: var(--info-bg); color: var(--info); }
-.badge-neutral { background: var(--bg-section); color: #666; }
-
-/* ── PROGRESS BAR ── */
-.progress-wrap { margin-top: 8px; }
-.progress-track {
-  height: 6px; background: var(--bg-section); border-radius: 99px; overflow: hidden;
-}
-.progress-fill {
-  height: 100%; border-radius: 99px; background: var(--accent);
-  transition: width 0.6s ease;
-}
-.progress-labels {
-  display: flex; justify-content: space-between;
-  font-size: 11px; color: var(--text-body); margin-top: 5px;
-}
-
-/* ── TIMELINE ── */
-.timeline-item {
-  display: flex; gap: 12px; padding: 12px 0;
-  border-bottom: 1px solid var(--border);
-}
-.timeline-item:last-child { border-bottom: none; }
-.tl-dot-wrap {
-  display: flex; flex-direction: column; align-items: center; flex-shrink: 0;
-}
-.tl-dot {
-  width: 28px; height: 28px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 11px; font-weight: 700;
-}
-.tl-dot.done { background: var(--success-bg); color: var(--success); }
-.tl-dot.pending { background: var(--warning-bg); color: var(--warning); }
-.tl-dot.future { background: var(--bg-section); color: #aaa; }
-.tl-line { flex: 1; width: 2px; background: var(--border); margin: 4px 0; min-height: 12px; }
-.tl-title { font-size: 13px; font-weight: 600; color: var(--text-heading); }
-.tl-sub { font-size: 12px; color: var(--text-body); margin-top: 2px; }
-.tl-date { font-size: 11px; color: #aaa; margin-top: 2px; }
-
-/* ── TABS (inside screen) ── */
-.inner-tabs {
-  display: flex; gap: 4px; margin-bottom: 16px;
-  background: var(--bg-section); border-radius: var(--radius-md); padding: 4px;
-}
-.itab {
-  flex: 1; text-align: center; padding: 8px 6px;
-  font-size: 12px; font-weight: 600;
-  border-radius: 7px; cursor: pointer; border: none; background: none;
-  color: var(--text-body); transition: all 150ms;
-}
-.itab.active { background: var(--bg-main); color: var(--accent); box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
-
-/* ── DEDUCTION ROW ── */
-.ded-row {
-  display: flex; align-items: center; gap: 10px;
-  padding: 11px 0; border-bottom: 1px solid var(--border);
-}
-.ded-row:last-child { border-bottom: none; }
-.ded-icon {
-  width: 34px; height: 34px; border-radius: 8px; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 16px;
-}
-.ded-info { flex: 1; }
-.ded-name { font-size: 13px; font-weight: 600; color: var(--text-heading); }
-.ded-desc { font-size: 11px; color: var(--text-body); margin-top: 1px; }
-.ded-val { font-size: 14px; font-weight: 700; color: var(--success); flex-shrink: 0; }
-
-/* ── CTA BUTTON ── */
-.btn-cta {
-  width: 100%; padding: 15px; border-radius: var(--radius-md);
-  background: var(--accent); color: #fff;
-  font-size: 14px; font-weight: 700;
-  border: none; cursor: pointer; margin-top: 4px;
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-  transition: opacity 150ms;
-}
-.btn-cta:hover { opacity: 0.9; }
-.btn-outline {
-  width: 100%; padding: 13px; border-radius: var(--radius-md);
-  background: transparent; color: var(--accent);
-  font-size: 14px; font-weight: 700;
-  border: 1.5px solid var(--accent); cursor: pointer; margin-top: 8px;
-  transition: background 150ms;
-}
-.btn-outline:hover { background: var(--bg-section); }
-
-/* ── DONUT CHART ── */
-.donut-wrap { display: flex; align-items: center; gap: 16px; }
-.donut-legend { flex: 1; }
-.donut-legend-item { display: flex; align-items: center; gap: 8px; padding: 4px 0; }
-.donut-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-.donut-legend-label { font-size: 12px; color: var(--text-body); flex: 1; }
-.donut-legend-val { font-size: 12px; font-weight: 700; color: var(--text-heading); }
-
-/* ── PROFILE ── */
-.profile-header {
-  background: var(--accent);
-  border-radius: var(--radius-lg);
-  padding: 20px;
-  display: flex; align-items: center; gap: 14px;
-  margin-bottom: 12px;
-}
-.profile-avatar {
-  width: 52px; height: 52px; border-radius: 50%;
-  background: rgba(255,255,255,0.15);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 22px; font-weight: 700; color: white;
-  flex-shrink: 0;
-}
-.profile-name { font-size: 17px; font-weight: 700; color: white; letter-spacing: -0.02em; }
-.profile-pesel { font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 2px; }
-.profile-year { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 2px; }
-
-/* ── ALERT ── */
-.alert {
-  display: flex; gap: 10px; padding: 12px 14px;
-  border-radius: var(--radius-md); margin-bottom: 12px;
-  border: 1px solid;
-}
-.alert-info { background: var(--info-bg); border-color: #BFDBFE; }
-.alert-info svg { color: var(--info); flex-shrink: 0; margin-top: 1px; }
-.alert-text { font-size: 12px; color: var(--text-body); }
-.alert-text strong { color: var(--text-heading); }
-
-/* ── ZEBRA ── */
-.zebra-row {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 9px 12px; font-size: 12px;
-}
-.zebra-row:nth-child(odd) { background: var(--bg-section); border-radius: 4px; }
-.zebra-key { color: var(--text-body); }
-.zebra-val { font-weight: 600; color: var(--text-heading); }
-
-/* ── MODAL / TOAST ── */
-.toast {
-  position: fixed; bottom: calc(var(--tab-h) + 16px);
-  left: 50%; transform: translateX(-50%) translateY(80px);
-  background: var(--text-heading); color: white;
-  padding: 12px 20px; border-radius: var(--radius-md);
-  font-size: 13px; font-weight: 600;
-  z-index: 200; transition: transform 300ms ease;
-  white-space: nowrap;
-  pointer-events: none;
-}
-.toast.show { transform: translateX(-50%) translateY(0); }
-</style>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Triglyceride Defense</title>
+<meta name="description" content="A deeply sarcastic browser game where you defend a heart from rogue triglycerides. Clicking is cardio now.">
+<meta name="theme-color" content="#1a0005">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🫀</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
+<canvas id="game" aria-label="Game field: a heart surrounded by attacking triglycerides"></canvas>
 
-<!-- TOP NAV -->
-<div class="topnav">
-  <div>
-    <div class="topnav-title">e-PIT 2024</div>
-    <div class="topnav-sub">Zeznanie podatkowe PIT-37</div>
+<header id="hud" hidden>
+  <div class="hud-block hp">
+    <div class="label">Heart integrity</div>
+    <div class="hpbar"><div id="hpfill"></div></div>
+    <div class="sub"><canvas id="ecg" width="96" height="22"></canvas><span><span id="bpm">72</span> BPM</span></div>
   </div>
-  <div class="topnav-logo">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="m9 15 2 2 4-4"/>
-    </svg>
+  <div class="hud-block center">
+    <div class="label">Wave</div>
+    <div id="wave" class="big">1</div>
   </div>
-</div>
-
-<!-- SCREEN: PRZEGLĄD -->
-<div class="content screen active" id="screen-overview">
-
-  <div class="status-banner">
-    <div class="status-dot"></div>
-    <div>
-      <div class="status-banner-title">Zeznanie gotowe do akceptacji</div>
-      <div class="status-banner-body">Urząd Skarbowy wstępnie wypełnił Twój PIT-37 na podstawie danych od pracodawcy.</div>
-    </div>
+  <div class="hud-block right">
+    <div class="label">mg/dL removed</div>
+    <div id="score" class="big">0</div>
+    <div id="combo" class="sub"></div>
   </div>
+  <div class="hud-buttons">
+    <button id="pauseBtn" class="icon-btn" aria-label="Pause" title="Pause (P)">❚❚</button>
+    <button id="muteBtn" class="icon-btn" aria-label="Toggle sound" title="Sound (M)">🔊</button>
+  </div>
+</header>
 
+<div id="quip" aria-live="polite"></div>
+<div id="banner"><div class="b-title"></div><div class="b-sub"></div></div>
+
+<section id="menu" class="overlay">
   <div class="card">
-    <div class="card-title">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
-      Wynik zeznania
+    <div class="kicker">A cardiology simulator nobody asked for</div>
+    <h1>Triglyceride<br><span>Defense</span></h1>
+    <p class="tag">Rogue fat molecules are swimming toward your heart with one goal: <b>make it go boom</b>.
+      Your only weapon is <em>clicking</em>. Truly, modern medicine has peaked.</p>
+
+    <ul class="how">
+      <li><b>Click / tap</b> the triglycerides before they reach the heart.</li>
+      <li><b>Chain hits</b> for combo multipliers. Missing resets them. Like diets.</li>
+      <li><b>Grab power-ups</b>: 🐟 Omega-3 (nuke) · 💊 Statin (slow-mo) · 🥗 Salad (heal, ugh) · 🏃 Cardio (splash clicks)</li>
+    </ul>
+
+    <div class="bestiary">
+      <div><i style="--c:#f4c430"></i><b>Regular Trigly</b><span>Glycerol + 3 fatty acids + 0 remorse.</span></div>
+      <div><i style="--c:#d98b3a"></i><b>Deep-Fried Chonk</b><span>Takes 3 clicks. Took 3 seconds to eat.</span></div>
+      <div><i style="--c:#9cff3a"></i><b>Energy-Drink Zoomer</b><span>Fast. Jittery. Probably vapes.</span></div>
+      <div><i style="--c:#ff8fc8"></i><b>Buffet Splitter</b><span>Kill one, get three free. Just like the buffet.</span></div>
     </div>
-    <div class="big-row">
-      <div>
-        <div class="big-label">Do zwrotu</div>
-        <div class="big-num pos">+1 247,00 zł</div>
-      </div>
-      <span class="badge badge-success">Zwrot</span>
-    </div>
-    <div class="progress-wrap">
-      <div class="progress-track"><div class="progress-fill" style="width:72%"></div></div>
-      <div class="progress-labels"><span>Zapłacono: 8 640 zł</span><span>Należny: 7 393 zł</span></div>
-    </div>
+
+    <button id="startBtn" class="btn">Defend the heart</button>
+    <div class="best">Personal best: <b id="menuBest">0</b> mg/dL</div>
+    <p class="fine">Not medical advice. If you're getting medical advice from a browser game, we have bigger problems.</p>
   </div>
+</section>
 
-  <div class="divider-label">Podsumowanie przychodów</div>
+<section id="pause" class="overlay" hidden>
+  <div class="card small">
+    <h2>Paused</h2>
+    <p class="tag">The triglycerides are also waiting. Patiently. Menacingly.</p>
+    <button id="resumeBtn" class="btn">Resume</button>
+    <button id="quitBtn" class="btn ghost">Give up (classic)</button>
+  </div>
+</section>
 
+<section id="over" class="overlay" hidden>
   <div class="card">
-    <div class="row-item">
-      <span class="row-item-label">Przychód łączny</span>
-      <span class="row-item-val">72 000,00 zł</span>
+    <div class="kicker">Code blue. Well, code yellow. It's fat.</div>
+    <h2>Cardiac Event</h2>
+    <p id="overLine" class="tag"></p>
+    <div class="panel">
+      <div class="panel-title">Lipid panel — patient: you</div>
+      <div class="row"><span>Triglycerides removed</span><b><span id="oScore">0</span> mg/dL</b></div>
+      <div class="row"><span>Waves survived</span><b id="oWaves">0</b></div>
+      <div class="row"><span>Molecules destroyed</span><b id="oKills">0</b></div>
+      <div class="row"><span>Click accuracy</span><b id="oAcc">0%</b></div>
+      <div class="row"><span>Best combo</span><b id="oCombo">0</b></div>
+      <div class="row"><span>Personal best</span><b id="oBest">0</b></div>
     </div>
-    <div class="row-item">
-      <span class="row-item-label">Koszty uzyskania przychodu</span>
-      <span class="row-item-val neg">−3 000,00 zł</span>
-    </div>
-    <div class="row-item">
-      <span class="row-item-label">Dochód do opodatkowania</span>
-      <span class="row-item-val accent">69 000,00 zł</span>
-    </div>
-    <div class="row-item">
-      <span class="row-item-label">Odliczenia od dochodu</span>
-      <span class="row-item-val neg">−5 340,00 zł</span>
-    </div>
-    <div class="row-item">
-      <span class="row-item-label">Podstawa opodatkowania</span>
-      <span class="row-item-val accent">63 660,00 zł</span>
-    </div>
-    <div class="row-item">
-      <span class="row-item-label">Podatek należny (12%)</span>
-      <span class="row-item-val">7 393,20 zł</span>
-    </div>
-    <div class="row-item">
-      <span class="row-item-label">Zaliczki zapłacone</span>
-      <span class="row-item-val neg">−8 640,00 zł</span>
+    <p class="dx"><b>Doctor's note:</b> <span id="dx"></span></p>
+    <button id="retryBtn" class="btn">Try again (unlike real life)</button>
+    <div class="btn-row">
+      <button id="shareBtn" class="btn ghost">Brag about it</button>
+      <button id="menuBtn" class="btn ghost">Menu</button>
     </div>
   </div>
+</section>
 
-  <div class="divider-label">Struktura przychodów</div>
-
-  <div class="card">
-    <div class="donut-wrap">
-      <svg width="90" height="90" viewBox="0 0 90 90">
-        <circle cx="45" cy="45" r="35" fill="none" stroke="#EBEBEB" stroke-width="12"/>
-        <circle cx="45" cy="45" r="35" fill="none" stroke="#1E3932" stroke-width="12"
-          stroke-dasharray="176 44" stroke-dashoffset="44" stroke-linecap="round"/>
-        <circle cx="45" cy="45" r="35" fill="none" stroke="#047857" stroke-width="12"
-          stroke-dasharray="44 176" stroke-dashoffset="-132" stroke-linecap="round"/>
-        <text x="45" y="49" text-anchor="middle" font-family="Inter" font-size="11" font-weight="700" fill="#1A1A1A">100%</text>
-      </svg>
-      <div class="donut-legend">
-        <div class="donut-legend-item">
-          <div class="donut-dot" style="background:#1E3932"></div>
-          <div class="donut-legend-label">Umowa o pracę</div>
-          <div class="donut-legend-val">60 000 zł</div>
-        </div>
-        <div class="donut-legend-item">
-          <div class="donut-dot" style="background:#047857"></div>
-          <div class="donut-legend-label">Umowa zlecenie</div>
-          <div class="donut-legend-val">12 000 zł</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="divider-label">Akcje</div>
-  <button class="btn-cta" onclick="showToast('Akceptacja zostanie wysłana do e-US…')">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-    Zaakceptuj i wyślij
-  </button>
-  <button class="btn-outline" onclick="switchTab('docs')">Pobierz PDF zeznania</button>
-
-</div>
-
-<!-- SCREEN: ODLICZENIA -->
-<div class="content screen" id="screen-deductions">
-
-  <div class="inner-tabs">
-    <button class="itab active" onclick="switchItab(this,'ded-dochod')">Od dochodu</button>
-    <button class="itab" onclick="switchItab(this,'ded-podatek')">Od podatku</button>
-    <button class="itab" onclick="switchItab(this,'ded-ulgi')">Ulgi</button>
-  </div>
-
-  <div id="ded-dochod">
-    <div class="card">
-      <div class="card-title">Odliczenia od dochodu</div>
-      <div class="ded-row">
-        <div class="ded-icon" style="background:#EFF6FF; font-size:18px">🏡</div>
-        <div class="ded-info">
-          <div class="ded-name">Ulga termomodernizacyjna</div>
-          <div class="ded-desc">Wydatki na ocieplenie budynku</div>
-        </div>
-        <div class="ded-val">−2 340 zł</div>
-      </div>
-      <div class="ded-row">
-        <div class="ded-icon" style="background:#ECFDF5; font-size:18px">📚</div>
-        <div class="ded-info">
-          <div class="ded-name">Składki ZUS</div>
-          <div class="ded-desc">Składki ubezpieczeń społecznych</div>
-        </div>
-        <div class="ded-val">−3 000 zł</div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="big-row">
-        <div>
-          <div class="big-label">Łącznie odliczono od dochodu</div>
-          <div class="big-num pos">−5 340,00 zł</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div id="ded-podatek" style="display:none">
-    <div class="card">
-      <div class="card-title">Odliczenia od podatku</div>
-      <div class="ded-row">
-        <div class="ded-icon" style="background:#FEF3C7; font-size:18px">👶</div>
-        <div class="ded-info">
-          <div class="ded-name">Ulga prorodzinna</div>
-          <div class="ded-desc">1 dziecko · cały rok</div>
-        </div>
-        <div class="ded-val">−1 112 zł</div>
-      </div>
-      <div class="ded-row">
-        <div class="ded-icon" style="background:#ECFDF5; font-size:18px">💊</div>
-        <div class="ded-info">
-          <div class="ded-name">Składka zdrowotna</div>
-          <div class="ded-desc">NFZ — odliczenie 7.75%</div>
-        </div>
-        <div class="ded-val">−135 zł</div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="big-row">
-        <div>
-          <div class="big-label">Łącznie odliczono od podatku</div>
-          <div class="big-num pos">−1 247,00 zł</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div id="ded-ulgi" style="display:none">
-    <div class="alert alert-info">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
-      <div class="alert-text"><strong>Sprawdź, czy nie przysługują Ci dodatkowe ulgi.</strong> Poniżej lista najczęstszych, których możesz nie uwzględniać.</div>
-    </div>
-    <div class="card">
-      <div class="ded-row">
-        <div class="ded-icon" style="background:#F0FDF4; font-size:18px">🩺</div>
-        <div class="ded-info">
-          <div class="ded-name">Ulga rehabilitacyjna</div>
-          <div class="ded-desc">Wydatki na rehabilitację / leki</div>
-        </div>
-        <span class="badge badge-info">Sprawdź</span>
-      </div>
-      <div class="ded-row">
-        <div class="ded-icon" style="background:#FFF7ED; font-size:18px">💻</div>
-        <div class="ded-info">
-          <div class="ded-name">Ulga na internet</div>
-          <div class="ded-desc">Max 760 zł rocznie</div>
-        </div>
-        <span class="badge badge-info">Sprawdź</span>
-      </div>
-      <div class="ded-row">
-        <div class="ded-icon" style="background:#FEF2F2; font-size:18px">🎓</div>
-        <div class="ded-info">
-          <div class="ded-name">Ulga dla klasy średniej</div>
-          <div class="ded-desc">Przychody 68–133 tys. zł</div>
-        </div>
-        <span class="badge badge-neutral">Nie dotyczy</span>
-      </div>
-    </div>
-  </div>
-
-</div>
-
-<!-- SCREEN: HISTORIA -->
-<div class="content screen" id="screen-history">
-
-  <div class="divider-label">Status zeznania 2024</div>
-  <div class="card">
-    <div class="timeline-item">
-      <div class="tl-dot-wrap">
-        <div class="tl-dot done">✓</div>
-        <div class="tl-line"></div>
-      </div>
-      <div>
-        <div class="tl-title">Dane wstępne pobrane</div>
-        <div class="tl-sub">PIT-11 od pracodawcy wczytany automatycznie</div>
-        <div class="tl-date">15 lutego 2025</div>
-      </div>
-    </div>
-    <div class="timeline-item">
-      <div class="tl-dot-wrap">
-        <div class="tl-dot done">✓</div>
-        <div class="tl-line"></div>
-      </div>
-      <div>
-        <div class="tl-title">Zeznanie wstępnie obliczone</div>
-        <div class="tl-sub">Automatyczne uwzględnienie ulgi prorodzinnej</div>
-        <div class="tl-date">1 marca 2025</div>
-      </div>
-    </div>
-    <div class="timeline-item">
-      <div class="tl-dot-wrap">
-        <div class="tl-dot pending">!</div>
-        <div class="tl-line"></div>
-      </div>
-      <div>
-        <div class="tl-title">Oczekuje na akceptację</div>
-        <div class="tl-sub">Sprawdź dane i wyślij do US</div>
-        <div class="tl-date">Termin: 30 kwietnia 2025</div>
-      </div>
-    </div>
-    <div class="timeline-item">
-      <div class="tl-dot-wrap">
-        <div class="tl-dot future">4</div>
-        <div class="tl-line"></div>
-      </div>
-      <div>
-        <div class="tl-title">Weryfikacja przez US</div>
-        <div class="tl-sub">Po przesłaniu zeznania</div>
-        <div class="tl-date">Do 3 miesięcy od wysyłki</div>
-      </div>
-    </div>
-    <div class="timeline-item">
-      <div class="tl-dot-wrap">
-        <div class="tl-dot future">5</div>
-      </div>
-      <div>
-        <div class="tl-title">Zwrot podatku</div>
-        <div class="tl-sub">Przelew na konto bankowe</div>
-        <div class="tl-date">Do 45 dni od akceptacji</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="divider-label">Poprzednie lata</div>
-  <div class="card">
-    <div class="row-item">
-      <div>
-        <div style="font-size:13px;font-weight:600;color:var(--text-heading)">PIT-37 · 2023</div>
-        <div style="font-size:11px;color:var(--text-body);margin-top:2px">Wysłano 12 kwietnia 2024</div>
-      </div>
-      <div style="text-align:right">
-        <div style="font-size:14px;font-weight:700;color:var(--success)">+834 zł</div>
-        <span class="badge badge-success" style="margin-top:3px">Rozliczony</span>
-      </div>
-    </div>
-    <div class="row-item">
-      <div>
-        <div style="font-size:13px;font-weight:600;color:var(--text-heading)">PIT-37 · 2022</div>
-        <div style="font-size:11px;color:var(--text-body);margin-top:2px">Wysłano 28 marca 2023</div>
-      </div>
-      <div style="text-align:right">
-        <div style="font-size:14px;font-weight:700;color:var(--danger)">−120 zł</div>
-        <span class="badge badge-neutral" style="margin-top:3px">Dopłata</span>
-      </div>
-    </div>
-    <div class="row-item">
-      <div>
-        <div style="font-size:13px;font-weight:600;color:var(--text-heading)">PIT-37 · 2021</div>
-        <div style="font-size:11px;color:var(--text-body);margin-top:2px">Wysłano 7 marca 2022</div>
-      </div>
-      <div style="text-align:right">
-        <div style="font-size:14px;font-weight:700;color:var(--success)">+1 560 zł</div>
-        <span class="badge badge-success" style="margin-top:3px">Rozliczony</span>
-      </div>
-    </div>
-  </div>
-
-</div>
-
-<!-- SCREEN: DOKUMENTY -->
-<div class="content screen" id="screen-docs">
-
-  <div class="divider-label">Załączone dokumenty</div>
-
-  <div class="card">
-    <div class="ded-row">
-      <div class="ded-icon" style="background:#EFF6FF; font-size:18px">📄</div>
-      <div class="ded-info">
-        <div class="ded-name">PIT-11 (pracodawca)</div>
-        <div class="ded-desc">Technika Sp. z o.o. · FY 2024</div>
-      </div>
-      <span class="badge badge-success">OK</span>
-    </div>
-    <div class="ded-row">
-      <div class="ded-icon" style="background:#FEF3C7; font-size:18px">📄</div>
-      <div class="ded-info">
-        <div class="ded-name">PIT-11 (zlecenie)</div>
-        <div class="ded-desc">Konsulting ABC · umowa zlecenie</div>
-      </div>
-      <span class="badge badge-success">OK</span>
-    </div>
-    <div class="ded-row">
-      <div class="ded-icon" style="background:#F0FDF4; font-size:18px">🏡</div>
-      <div class="ded-info">
-        <div class="ded-name">Faktura — termomodernizacja</div>
-        <div class="ded-desc">FV/2024/08/312 · 2 340,00 zł</div>
-      </div>
-      <span class="badge badge-success">OK</span>
-    </div>
-    <div class="ded-row">
-      <div class="ded-icon" style="background:#FEF2F2; font-size:18px">➕</div>
-      <div class="ded-info">
-        <div class="ded-name">Dodaj dokument</div>
-        <div class="ded-desc">Faktura, zaświadczenie, inny</div>
-      </div>
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
-    </div>
-  </div>
-
-  <div class="divider-label">Dane z PIT-11 · Pracodawca 1</div>
-  <div class="card">
-    <div class="zebra-row"><span class="zebra-key">Płatnik</span><span class="zebra-val">Technika Sp. z o.o.</span></div>
-    <div class="zebra-row"><span class="zebra-key">NIP płatnika</span><span class="zebra-val">521-000-00-00</span></div>
-    <div class="zebra-row"><span class="zebra-key">Przychód</span><span class="zebra-val">60 000,00 zł</span></div>
-    <div class="zebra-row"><span class="zebra-key">KUP</span><span class="zebra-val">3 000,00 zł</span></div>
-    <div class="zebra-row"><span class="zebra-key">Zaliczka pobrana</span><span class="zebra-val">7 140,00 zł</span></div>
-    <div class="zebra-row"><span class="zebra-key">Składka zdrowotna</span><span class="zebra-val">4 320,00 zł</span></div>
-  </div>
-
-  <button class="btn-cta" onclick="showToast('Pobieranie PDF…')">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-    Pobierz zeznanie PDF
-  </button>
-
-</div>
-
-<!-- BOTTOM NAV -->
-<div class="bottomnav">
-  <button class="bnav-item active" id="tab-overview" onclick="switchTab('overview')">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
-    Przegląd
-  </button>
-  <button class="bnav-item" id="tab-deductions" onclick="switchTab('deductions')">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
-    Odliczenia
-  </button>
-  <button class="bnav-item" id="tab-history" onclick="switchTab('history')">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></svg>
-    Historia
-  </button>
-  <button class="bnav-item" id="tab-docs" onclick="switchTab('docs')">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><line x1="8" x2="16" y1="13" y2="13"/><line x1="8" x2="14" y1="17" y2="17"/></svg>
-    Dokumenty
-  </button>
-</div>
-
-<!-- TOAST -->
-<div class="toast" id="toast"></div>
-
-<script>
-const tabs = ['overview','deductions','history','docs'];
-
-function switchTab(name) {
-  tabs.forEach(t => {
-    document.getElementById('screen-'+t)?.classList.remove('active');
-    document.getElementById('tab-'+t)?.classList.remove('active');
-  });
-  document.getElementById('screen-'+name)?.classList.add('active');
-  document.getElementById('tab-'+name)?.classList.add('active');
-  window.scrollTo(0, 0);
-}
-
-function switchItab(btn, targetId) {
-  const tabs = btn.closest('.inner-tabs').querySelectorAll('.itab');
-  tabs.forEach(t => t.classList.remove('active'));
-  btn.classList.add('active');
-
-  const panel = btn.closest('.screen') || document.getElementById('screen-deductions');
-  ['ded-dochod','ded-podatek','ded-ulgi'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = id === targetId ? 'block' : 'none';
-  });
-}
-
-let toastTimer;
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
-}
-</script>
+<script src="game.js"></script>
 </body>
 </html>
